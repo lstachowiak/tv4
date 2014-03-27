@@ -42,34 +42,20 @@ describe("Combinators 03", function () {
     it("oneOf success (complex schema)", function() {
         tv4.addSchema({
             "type": "object",
-            "id": "http://remoney.co.uk/transaction-repository/transaction.json",
+            "id": "http://remoney.co.uk/wrong-url-here/bank-commission.json",
             "properties": {
-                "transaction_id": {"type": "string"},
-                "status_description": {"type": "string"},
-                "service_errors" : {
-                    "type": "array"
-                }
+                "type": {"type": "string", "pattern": "^BANK_COMMISSION$"}
             },
-            "required": ["transaction_id"],
-            "additionalProperties": false});
-        tv4.addSchema({
-            "type": "object",
-            "id": "http://remoney.co.uk/transaction-repository/bank-commission.json",
-            "properties": {
-                "type": {"type": "string", "pattern": "^BANK_COMMISSION$"},
-                "transaction": {"$ref": "/transaction-repository/transaction.json"},
-            },
-            "required": ["type", "transaction"],
+            "required": ["type"],
             "additionalProperties": false
         });
         tv4.addSchema({
             "type": "object",
             "id": "http://remoney.co.uk/transaction-repository/bank-interest.json",
             "properties": {
-                "type": {"type": "string", "pattern": "^BANK_INTEREST"},
-                "transaction": {"$ref": "/transaction-repository/transaction.json"}
+                "type": {"type": "string", "pattern": "^BANK_INTEREST"}
             },
-            "required": ["type", "transaction"],
+            "required": ["type"],
             "additionalProperties": false
         });
         tv4.addSchema({
@@ -81,13 +67,10 @@ describe("Combinators 03", function () {
         ]});
     
         var result = tv4.validateResult({
-            "type": "BANK_INTEREST",
-            "transaction" : {
-                "transaction_id": "id"
-            }
+            "type": "BANK_INTEREST"
         }, 
             'http://remoney.co.uk/transaction-repository/any-transaction.json');
-        assert.isNull(result.error);
-        assert.equal(result.missing.length, 0);
+        assert.isNotNull(result.error);
+        assert.equal(result.missing.length, 1);
     });
 });
